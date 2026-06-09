@@ -25,7 +25,14 @@ app.use('/api/alumnos',       require('./src/routes/alumnos'))
 app.use('/api/rutinas',       require('./src/routes/rutinas'))
 app.use('/api/pagos',         require('./src/routes/pagos'))
 app.use('/api/configuracion', require('./src/routes/configuracion'))
-app.use('/api/whatsapp',      require('./src/routes/whatsapp'))
+
+// WhatsApp: opcional (requiere whatsapp-web.js instalado localmente)
+try {
+  app.use('/api/whatsapp', require('./src/routes/whatsapp'))
+  console.log('WhatsApp rutas habilitadas')
+} catch (e) {
+  console.warn('WhatsApp no disponible en este entorno:', e.message)
+}
 
 app.use((req, res) => {
   res.status(404).json({ error: `Ruta no encontrada: ${req.method} ${req.path}` })
@@ -42,6 +49,7 @@ app.listen(PORT, () => {
   console.log(`Health: http://localhost:${PORT}/api/health`)
   console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`)
 
+  // Cron de alertas (opcional)
   try {
     const { iniciarCronAlertas } = require('./src/jobs/alertasVencimiento')
     iniciarCronAlertas()
