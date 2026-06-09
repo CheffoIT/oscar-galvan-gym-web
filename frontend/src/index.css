@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ───────────────────────────────────────────── */
+@layer base {
+  html { scroll-behavior: smooth; }
+
+  body {
+    @apply bg-gym-black text-gym-white font-body;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * { box-sizing: border-box; }
+
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-gym-dark; }
+  ::-webkit-scrollbar-thumb { @apply bg-gym-purple rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-gym-purplel; }
+
+  ::selection {
+    background: rgba(107, 33, 168, 0.4);
+    color: #F8FAFC;
+  }
+}
+
+/* ── Component shortcuts ────────────────────────────── */
+@layer components {
+  /* Títulos con estilo display */
+  .gym-title {
+    @apply font-display tracking-wider uppercase;
+  }
+
+  /* Card oscura estándar */
+  .gym-card {
+    @apply bg-gym-card border border-gym-border rounded-xl p-5
+           shadow-gym transition-all duration-300;
+  }
+  .gym-card:hover {
+    @apply shadow-gym-hover border-gym-purple/40;
+  }
+
+  /* Botón amarillo principal */
+  .btn-primary {
+    @apply bg-gym-yellow text-gym-black font-bold px-6 py-3 rounded-lg
+           transition-all duration-200 hover:bg-gym-yellowl
+           hover:shadow-yellow active:scale-95 cursor-pointer;
+  }
+
+  /* Botón morado secundario */
+  .btn-secondary {
+    @apply border border-gym-purple text-gym-purplel font-semibold px-6 py-3 rounded-lg
+           transition-all duration-200 hover:bg-gym-purple/20
+           active:scale-95 cursor-pointer;
+  }
+
+  /* Botón ghost */
+  .btn-ghost {
+    @apply text-gym-gray font-medium px-4 py-2 rounded-lg
+           transition-all duration-200 hover:text-gym-white hover:bg-gym-border
+           cursor-pointer;
+  }
+
+  /* Input oscuro */
+  .gym-input {
+    @apply w-full bg-gym-dark border border-gym-border text-gym-white
+           placeholder:text-gym-grays rounded-lg px-4 py-3
+           focus:outline-none focus:border-gym-purple focus:ring-1 focus:ring-gym-purple/50
+           transition-all duration-200;
+  }
+
+  /* Badge de estado */
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-green  { @apply badge bg-green-900/40  text-green-400  border border-green-800; }
+  .badge-red    { @apply badge bg-red-900/40    text-red-400    border border-red-800; }
+  .badge-yellow { @apply badge bg-yellow-900/40 text-yellow-400 border border-yellow-800; }
+  .badge-gray   { @apply badge bg-zinc-800      text-gym-gray   border border-gym-border; }
+  .badge-purple { @apply badge bg-purple-900/40 text-purple-300 border border-purple-800; }
+
+  /* Línea divisora con acento */
+  .gym-divider {
+    @apply border-0 h-px bg-gradient-to-r from-transparent via-gym-purple to-transparent my-8;
+  }
+
+  /* Sidebar nav link */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-gym-gray
+           font-medium transition-all duration-200 cursor-pointer
+           hover:text-gym-white hover:bg-gym-border;
+  }
+  .sidebar-link.active {
+    @apply text-gym-white bg-gym-purple/20 border border-gym-purple/30;
+  }
+}
+
+/* ── Utilidades especiales ──────────────────────────── */
+@layer utilities {
+  /* Texto con gradiente morado-amarillo */
+  .text-gradient {
+    @apply bg-gradient-to-r from-gym-purplel to-gym-yellow bg-clip-text text-transparent;
+  }
+
+  /* Glow morado suave */
+  .glow-purple { box-shadow: 0 0 20px rgba(107,33,168,0.4); }
+  .glow-yellow { box-shadow: 0 0 20px rgba(234,179,8,0.4); }
+
+  /* Bordes con gradiente */
+  .border-gradient {
+    border: 1px solid transparent;
+    background: linear-gradient(#1a1a2e,#1a1a2e) padding-box,
+                linear-gradient(135deg,#6B21A8,#EAB308) border-box;
+  }
+
+  /* Diagonal decorativa */
+  .diagonal-cut {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+  }
+}
+
+/* ── Animaciones ────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(30px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes slideInLeft {
+  from { opacity:0; transform:translateX(-30px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+
+.animate-float     { animation: float 3s ease-in-out infinite; }
+.animate-fade-up   { animation: fadeInUp 0.6s ease forwards; }
+.animate-slide-in  { animation: slideInLeft 0.5s ease forwards; }
