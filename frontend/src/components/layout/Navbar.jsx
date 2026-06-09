@@ -23,7 +23,6 @@ export default function Navbar({ publicMode = false }) {
     return '/login'
   }
 
-  // Logo click: si ya estamos en "/" hace scroll al top; si no, navega a "/"
   const handleLogoClick = (e) => {
     if (location.pathname === '/') {
       e.preventDefault()
@@ -36,7 +35,6 @@ export default function Navbar({ publicMode = false }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
 
-          {/* Logo */}
           <Link to="/" onClick={handleLogoClick} className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gym-purple rounded-lg flex items-center justify-center text-white font-display text-lg overflow-hidden">
               {logoUrl
@@ -48,7 +46,6 @@ export default function Navbar({ publicMode = false }) {
             </span>
           </Link>
 
-          {/* Links desktop */}
           {publicMode && (
             <div className="hidden md:flex items-center gap-6 text-sm font-medium text-gym-gray">
               <a href="#servicios"  className="hover:text-gym-yellow transition-colors">Servicios</a>
@@ -59,7 +56,6 @@ export default function Navbar({ publicMode = false }) {
             </div>
           )}
 
-          {/* Derecha */}
           <div className="flex items-center gap-3">
             {user ? (
               <>
@@ -99,7 +95,6 @@ export default function Navbar({ publicMode = false }) {
               </>
             )}
 
-            {/* Hamburguesa mobile */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="md:hidden text-gym-gray hover:text-gym-white p-1"
@@ -112,11 +107,25 @@ export default function Navbar({ publicMode = false }) {
         </div>
       </div>
 
-      {/* Mobile menu */}
       {menuOpen && publicMode && (
         <div className="md:hidden bg-gym-dark border-t border-gym-border px-4 py-4 space-y-3">
           <a href="#servicios" onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Servicios</a>
           <a href="#horarios"  onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Horarios</a>
           <a href="#planes"    onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Planes</a>
           <a href="#caminatas" onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Caminatas</a>
-          <a href="#contacto"  onClick={() => setMenuOpen(false)} 
+          <a href="#contacto"  onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Contacto</a>
+          {!user && (
+            <>
+              <Link to="/register" onClick={() => setMenuOpen(false)} className="block text-center mt-2 rounded-lg px-4 py-2 border border-gym-purple text-gym-purplel font-bold">
+                Crear cuenta
+              </Link>
+              <Link to="/login" onClick={() => setMenuOpen(false)} className="block text-center mt-2 rounded-lg px-4 py-2 bg-gym-yellow text-gym-black font-bold">
+                Ingresar
+              </Link>
+            </>
+          )}
+        </div>
+      )}
+    </nav>
+  )
+}

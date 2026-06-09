@@ -9,13 +9,13 @@ const ROLES = [
     value: 'alumno',
     label: 'Alumno',
     icon: '🏋️',
-    desc: 'Accedé a tus rutinas, pagos y seguimiento personal.',
+    desc: 'Accede a tus rutinas, pagos y seguimiento personal.',
   },
   {
     value: 'entrenador',
     label: 'Entrenador',
     icon: '📋',
-    desc: 'Gestioná rutinas y seguí el progreso de tus alumnos.',
+    desc: 'Gestiona rutinas y segui el progreso de tus alumnos.',
   },
 ]
 
@@ -36,7 +36,7 @@ export default function RegisterPage() {
     setError('')
 
     if (!form.rol) {
-      setError('Elegí si sos alumno o entrenador.')
+      setError('Elegi si sos alumno o entrenador.')
       return
     }
     if (form.password !== form.confirmar) {
@@ -48,15 +48,12 @@ export default function RegisterPage() {
       return
     }
     if (!supabase) {
-      setError('Error de configuración. Contactá al administrador.')
+      setError('Error de configuracion. Contacta al administrador.')
       return
     }
 
     setLoading(true)
 
-    // 1. Crear usuario en Supabase Auth
-    //    Los metadatos (nombre, apellido, rol) se guardan en raw_user_meta_data
-    //    y el trigger de la BD los usa para crear el perfil automáticamente.
     const { data, error: signUpError } = await supabase.auth.signUp({
       email:    form.email.trim().toLowerCase(),
       password: form.password,
@@ -72,19 +69,16 @@ export default function RegisterPage() {
     if (signUpError) {
       const mensajes = {
         'User already registered':                    'Ya existe una cuenta con ese email.',
-        'Email address is invalid':                   'El email ingresado no es válido.',
+        'Email address is invalid':                   'El email ingresado no es valido.',
         'Password should be at least 6 characters':   'La contraseña debe tener al menos 6 caracteres.',
-        'signup is disabled':                         'El registro está temporalmente desactivado.',
+        'signup is disabled':                         'El registro esta temporalmente desactivado.',
       }
       setError(mensajes[signUpError.message] || signUpError.message)
       setLoading(false)
       return
     }
 
-    // 2. Si hay sesión inmediata (email_confirm desactivado en Supabase),
-    //    insertamos el perfil ahora. Si no, el trigger lo hará al confirmar email.
     if (data.session && data.user) {
-      // Sesión inmediata — insertar perfil directamente
       await supabase.from('perfiles').upsert({
         id:       data.user.id,
         nombre:   form.nombre.trim(),
@@ -94,7 +88,6 @@ export default function RegisterPage() {
         activo:   true,
       })
 
-      // Si es alumno, crear fila en tabla alumnos
       if (form.rol === 'alumno') {
         await supabase.from('alumnos').insert({
           nombre:   form.nombre.trim(),
@@ -112,7 +105,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-gym-black flex">
 
-      {/* Panel izquierdo — decorativo */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
         style={{ background: 'linear-gradient(135deg, #050505 0%, #0d0520 50%, #1a0540 100%)' }}>
         <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-gym-purple/15 rounded-full blur-3xl" />
@@ -126,20 +118,18 @@ export default function RegisterPage() {
             <span className="text-gym-yellow">GALVAN</span>
           </h1>
           <p className="font-display text-2xl text-gym-purplel tracking-widest mt-2 mb-8">
-            FUERZA & MUSCULACIÓN
+            FUERZA &amp; MUSCULACION
           </p>
           <div className="h-px w-24 bg-gym-purple mb-8" />
           <p className="text-gym-gray text-sm leading-relaxed max-w-xs">
-            Creá tu cuenta y accedé a tu panel personalizado con rutinas, pagos y seguimiento.
+            Crea tu cuenta y accede a tu panel personalizado con rutinas, pagos y seguimiento.
           </p>
         </div>
       </div>
 
-      {/* Panel derecho — formulario */}
       <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
 
-          {/* Mobile logo */}
           <div className="lg:hidden text-center mb-8">
             <div className="w-14 h-14 bg-gym-purple rounded-xl flex items-center justify-center text-white font-display text-3xl mx-auto mb-3 shadow-gym">
               G
@@ -150,31 +140,28 @@ export default function RegisterPage() {
           </div>
 
           {success ? (
-            /* ── Pantalla de éxito ── */
             <div className="text-center space-y-6">
-              <div className="w-16 h-16 bg-green-500/20 border border-green-500/40 rounded-full
-                flex items-center justify-center text-3xl mx-auto">
+              <div className="w-16 h-16 bg-green-500/20 border border-green-500/40 rounded-full flex items-center justify-center text-3xl mx-auto">
                 ✅
               </div>
               <div>
-                <h2 className="font-display text-3xl text-gym-white tracking-wider mb-2">¡LISTO!</h2>
+                <h2 className="font-display text-3xl text-gym-white tracking-wider mb-2">LISTO!</h2>
                 <p className="text-gym-gray text-sm">
                   Tu cuenta fue creada exitosamente.<br/>
-                  Ya podés ingresar con tu email y contraseña.
+                  Ya podes ingresar con tu email y contraseña.
                 </p>
               </div>
               <Button variant="primary" size="lg" fullWidth onClick={() => navigate('/login')}>
-                Ir al ingreso →
+                Ir al ingreso
               </Button>
             </div>
           ) : (
             <>
               <h2 className="font-display text-3xl text-gym-white tracking-wider mb-1">CREAR CUENTA</h2>
-              <p className="text-gym-gray text-sm mb-6">Completá tus datos para registrarte.</p>
+              <p className="text-gym-gray text-sm mb-6">Completa tus datos para registrarte.</p>
 
               <form onSubmit={handleSubmit} className="space-y-4">
 
-                {/* Selector de rol */}
                 <div>
                   <label className="block text-sm font-medium text-gym-gray mb-2">
                     Soy... <span className="text-red-400">*</span>
@@ -203,7 +190,6 @@ export default function RegisterPage() {
                   </div>
                 </div>
 
-                {/* Nombre y apellido */}
                 <div className="grid grid-cols-2 gap-3">
                   <Input
                     label="Nombre *"
@@ -214,7 +200,7 @@ export default function RegisterPage() {
                   />
                   <Input
                     label="Apellido *"
-                    placeholder="Pérez"
+                    placeholder="Perez"
                     value={form.apellido}
                     onChange={set('apellido')}
                     required
@@ -234,7 +220,7 @@ export default function RegisterPage() {
                 <Input
                   label="Contraseña *"
                   type="password"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Minimo 6 caracteres"
                   value={form.password}
                   onChange={set('password')}
                   icon="🔒"
@@ -244,9 +230,44 @@ export default function RegisterPage() {
                 <Input
                   label="Confirmar contraseña *"
                   type="password"
-                  placeholder="Repetí la contraseña"
+                  placeholder="Repeti la contraseña"
                   value={form.confirmar}
                   onChange={set('confirmar')}
                   icon="🔒"
                   required
-               
+                />
+
+                {error && (
+                  <div className="bg-red-900/30 border border-red-800 rounded-lg px-4 py-3 text-red-400 text-sm">
+                    {error}
+                  </div>
+                )}
+
+                <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
+                  {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+                </Button>
+              </form>
+
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-gym-border" />
+                <span className="text-gym-grays text-xs">o</span>
+                <div className="flex-1 h-px bg-gym-border" />
+              </div>
+              <div className="text-center space-y-2">
+                <p className="text-gym-gray text-sm">
+                  Ya tenes cuenta?{' '}
+                  <Link to="/login" className="text-gym-purplel hover:text-gym-yellow transition-colors font-medium">
+                    Ingresa aca
+                  </Link>
+                </p>
+                <Link to="/" className="block text-gym-gray text-sm hover:text-gym-yellow transition-colors">
+                  Volver al sitio del gimnasio
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

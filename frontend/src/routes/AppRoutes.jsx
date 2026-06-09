@@ -13,19 +13,13 @@ import WhatsappPage         from '../pages/admin/WhatsappPage'
 import EntrenadorDashboard  from '../pages/entrenador/EntrenadorDashboard'
 import AlumnoDashboard      from '../pages/alumno/AlumnoDashboard'
 
-/**
- * Ruta protegida.
- * - Si no hay sesión → redirige a /login
- * - Si hay sesión pero el rol no coincide (y no es admin) → redirige al panel propio
- * - Admin puede acceder a cualquier ruta protegida
- */
 function PrivateRoute({ children, allowedRoles }) {
   const { role, loading } = useAuth()
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gym-black flex items-center justify-center">
-        <p className="text-gym-gray text-sm">Verificando sesión...</p>
+        <p className="text-gym-gray text-sm">Verificando sesion...</p>
       </div>
     )
   }
@@ -33,7 +27,6 @@ function PrivateRoute({ children, allowedRoles }) {
   if (!role) return <Navigate to="/login" replace />
 
   if (allowedRoles && !allowedRoles.includes(role)) {
-    // Redirigir al panel que le corresponde
     const panelPorRol = { admin: '/admin', entrenador: '/entrenador', alumno: '/alumno' }
     return <Navigate to={panelPorRol[role] || '/login'} replace />
   }
@@ -44,12 +37,10 @@ function PrivateRoute({ children, allowedRoles }) {
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ── Pública ──────────────────────────────── */}
       <Route path="/"          element={<LandingPage />} />
       <Route path="/login"     element={<LoginPage />} />
       <Route path="/register"  element={<RegisterPage />} />
 
-      {/* ── Admin ────────────────────────────────── */}
       <Route path="/admin" element={
         <PrivateRoute allowedRoles={['admin']}><AdminDashboard /></PrivateRoute>
       }/>
@@ -72,10 +63,15 @@ export default function AppRoutes() {
         <PrivateRoute allowedRoles={['admin']}><WhatsappPage /></PrivateRoute>
       }/>
 
-      {/* ── Entrenador ───────────────────────────── */}
       <Route path="/entrenador" element={
         <PrivateRoute allowedRoles={['entrenador', 'admin']}><EntrenadorDashboard /></PrivateRoute>
       }/>
 
-      {/* ── Alumno ───────────────────────────────── */}
-      <Route path
+      <Route path="/alumno" element={
+        <PrivateRoute allowedRoles={['alumno', 'admin']}><AlumnoDashboard /></PrivateRoute>
+      }/>
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
