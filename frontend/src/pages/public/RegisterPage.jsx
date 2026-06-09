@@ -78,24 +78,16 @@ export default function RegisterPage() {
       return
     }
 
+    // El trigger on_auth_user_created ya crea perfiles y alumnos automáticamente.
+    // Solo hacemos upsert de seguridad sin campos que no existen en la tabla.
     if (data.session && data.user) {
       await supabase.from('perfiles').upsert({
         id:       data.user.id,
         nombre:   form.nombre.trim(),
         apellido: form.apellido.trim(),
-        email:    form.email.trim().toLowerCase(),
         rol:      form.rol,
         activo:   true,
-      })
-
-      if (form.rol === 'alumno') {
-        await supabase.from('alumnos').insert({
-          nombre:   form.nombre.trim(),
-          apellido: form.apellido.trim(),
-          email:    form.email.trim().toLowerCase(),
-          estado:   'activo',
-        })
-      }
+      }, { onConflict: 'id' })
     }
 
     setLoading(false)
@@ -271,3 +263,4 @@ export default function RegisterPage() {
     </div>
   )
 }
+                                                                                                                                      
