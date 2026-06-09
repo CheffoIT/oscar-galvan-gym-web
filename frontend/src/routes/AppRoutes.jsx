@@ -2,12 +2,14 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import LandingPage          from '../pages/public/LandingPage'
 import LoginPage            from '../pages/public/LoginPage'
+import RegisterPage         from '../pages/public/RegisterPage'
 import AdminDashboard       from '../pages/admin/AdminDashboard'
 import AlumnosPage          from '../pages/admin/AlumnosPage'
 import EntrenadoresPage     from '../pages/admin/EntrenadoresPage'
 import RutinasPage          from '../pages/admin/RutinasPage'
 import PagosPage            from '../pages/admin/PagosPage'
 import ConfiguracionPage    from '../pages/admin/ConfiguracionPage'
+import WhatsappPage         from '../pages/admin/WhatsappPage'
 import EntrenadorDashboard  from '../pages/entrenador/EntrenadorDashboard'
 import AlumnoDashboard      from '../pages/alumno/AlumnoDashboard'
 
@@ -43,8 +45,9 @@ export default function AppRoutes() {
   return (
     <Routes>
       {/* ── Pública ──────────────────────────────── */}
-      <Route path="/"      element={<LandingPage />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/"          element={<LandingPage />} />
+      <Route path="/login"     element={<LoginPage />} />
+      <Route path="/register"  element={<RegisterPage />} />
 
       {/* ── Admin ────────────────────────────────── */}
       <Route path="/admin" element={
@@ -65,6 +68,9 @@ export default function AppRoutes() {
       <Route path="/admin/configuracion" element={
         <PrivateRoute allowedRoles={['admin']}><ConfiguracionPage /></PrivateRoute>
       }/>
+      <Route path="/admin/whatsapp" element={
+        <PrivateRoute allowedRoles={['admin']}><WhatsappPage /></PrivateRoute>
+      }/>
 
       {/* ── Entrenador ───────────────────────────── */}
       <Route path="/entrenador" element={
@@ -72,12 +78,4 @@ export default function AppRoutes() {
       }/>
 
       {/* ── Alumno ───────────────────────────────── */}
-      <Route path="/alumno" element={
-        <PrivateRoute allowedRoles={['alumno', 'admin']}><AlumnoDashboard /></PrivateRoute>
-      }/>
-
-      {/* ── Fallback ─────────────────────────────── */}
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
-  )
-}
+      <Route path

@@ -83,12 +83,20 @@ export default function Navbar({ publicMode = false }) {
                 </button>
               </>
             ) : (
-              <Link
-                to="/login"
-                className="bg-gym-yellow text-gym-black font-bold text-sm px-4 py-2 rounded-lg hover:bg-gym-yellowl transition-all"
-              >
-                Ingresar
-              </Link>
+              <>
+                <Link
+                  to="/register"
+                  className="hidden sm:block border border-gym-purple text-gym-purplel font-bold text-sm px-4 py-2 rounded-lg hover:bg-gym-purple/20 transition-all"
+                >
+                  Crear cuenta
+                </Link>
+                <Link
+                  to="/login"
+                  className="bg-gym-yellow text-gym-black font-bold text-sm px-4 py-2 rounded-lg hover:bg-gym-yellowl transition-all"
+                >
+                  Ingresar
+                </Link>
+              </>
             )}
 
             {/* Hamburguesa mobile */}
@@ -111,14 +119,4 @@ export default function Navbar({ publicMode = false }) {
           <a href="#horarios"  onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Horarios</a>
           <a href="#planes"    onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Planes</a>
           <a href="#caminatas" onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Caminatas</a>
-          <a href="#contacto"  onClick={() => setMenuOpen(false)} className="block text-gym-gray hover:text-gym-yellow py-2">Contacto</a>
-          {!user && (
-            <Link to="/login" className="block btn-primary text-center mt-2 rounded-lg px-4 py-2 bg-gym-yellow text-gym-black font-bold">
-              Ingresar al sistema
-            </Link>
-          )}
-        </div>
-      )}
-    </nav>
-  )
-}
+          <a href="#contacto"  onClick={() => setMenuOpen(false)} 

@@ -1,44 +1,46 @@
 const router    = require('express').Router()
-const jwt       = require('jsonwebtoken')
-const bcrypt    = require('bcryptjs')
+const { supabase } = require('../config/supabase')
 
-// Demo usuarios en memoria — reemplazar con Supabase Auth
-const users = [
-  { id:'0', nombre:'Oscar Galvan', email:'admin@gym.com',       passwordHash: bcrypt.hashSync('admin123',10),       rol:'admin' },
-  { id:'1', nombre:'Carlos Ramos', email:'entrenador@gym.com',  passwordHash: bcrypt.hashSync('entrenador123',10),  rol:'entrenador' },
-  { id:'2', nombre:'Lucas Fernández', email:'alumno@gym.com',   passwordHash: bcrypt.hashSync('alumno123',10),      rol:'alumno', alumnoId:'1' },
-]
+// POST /api/auth/register
+// Crea un usuario nuevo (alumno o entrenador) en Supabase Auth + tabla perfiles
+router.post('/register', async (req, res) => {
+  const { nombre, apellido, email, password, rol } = req.body
 
-// POST /api/auth/login
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email y contraseña requeridos' })
+  if (!nombre || !apellido || !email || !password || !rol) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' })
   }
 
-  const user = users.find(u => u.email === email)
-  if (!user) return res.status(401).json({ error: 'Credenciales incorrectas' })
+  if (!['alumno', 'entrenador'].includes(rol)) {
+    return res.status(400).json({ error: 'Rol inválido. Solo alumno o entrenador.' })
+  }
 
-  const valid = await bcrypt.compare(password, user.passwordHash)
-  if (!valid) return res.status(401).json({ error: 'Credenciales incorrectas' })
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres.' })
+  }
 
-  const token = jwt.sign(
-    { id: user.id, email: user.email, rol: user.rol, alumnoId: user.alumnoId },
-    process.env.JWT_SECRET || 'dev-secret',
-    { expiresIn: '8h' }
-  )
+  if (!supabase) {
+    return res.status(503).json({ error: 'Servicio no disponible (Supabase no configurado).' })
+  }
 
-  res.json({
-    token,
-    user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol }
+  // 1. Crear usuario en Supabase Auth (con email ya confirmado)
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,   // sin paso de confirmación por email
+    user_metadata: { nombre, apellido, rol },
   })
-})
 
-// POST /api/auth/logout
-router.post('/logout', (req, res) => {
-  // Con JWT stateless el logout es del lado del cliente (borrar token)
-  // Con Supabase Auth se usa supabase.auth.signOut()
-  res.json({ message: 'Sesión cerrada' })
-})
+  if (authError) {
+    const mensajes = {
+      'User already registered': 'Ya existe una cuenta con ese email.',
+      'Email address is invalid': 'El email ingresado no es válido.',
+      'Password should be at least 6 characters': 'La contraseña debe tener al menos 6 caracteres.',
+    }
+    return res.status(400).json({ error: mensajes[authError.message] || authError.message })
+  }
 
-module.exports = router
+  const userId = authData.user.id
+
+  // 2. Insertar perfil en la tabla perfiles
+  const { error: perfilError } = await supabase
+    .f
