@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { supabase } from '../../services/supabaseClient'
 import Input  from '../../components/ui/Input'
 import Button from '../../components/ui/Button'
-
-const API = import.meta.env.VITE_API_URL || 'http://localhost:3001'
 
 const ROLES = [
   {
@@ -48,30 +47,66 @@ export default function RegisterPage() {
       setError('La contraseña debe tener al menos 6 caracteres.')
       return
     }
+    if (!supabase) {
+      setError('Error de configuración. Contactá al administrador.')
+      return
+    }
 
     setLoading(true)
-    try {
-      const res = await fetch(`${API}/api/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+
+    // 1. Crear usuario en Supabase Auth
+    //    Los metadatos (nombre, apellido, rol) se guardan en raw_user_meta_data
+    //    y el trigger de la BD los usa para crear el perfil automáticamente.
+    const { data, error: signUpError } = await supabase.auth.signUp({
+      email:    form.email.trim().toLowerCase(),
+      password: form.password,
+      options: {
+        data: {
+          nombre:   form.nombre.trim(),
+          apellido: form.apellido.trim(),
+          rol:      form.rol,
+        },
+      },
+    })
+
+    if (signUpError) {
+      const mensajes = {
+        'User already registered':                    'Ya existe una cuenta con ese email.',
+        'Email address is invalid':                   'El email ingresado no es válido.',
+        'Password should be at least 6 characters':   'La contraseña debe tener al menos 6 caracteres.',
+        'signup is disabled':                         'El registro está temporalmente desactivado.',
+      }
+      setError(mensajes[signUpError.message] || signUpError.message)
+      setLoading(false)
+      return
+    }
+
+    // 2. Si hay sesión inmediata (email_confirm desactivado en Supabase),
+    //    insertamos el perfil ahora. Si no, el trigger lo hará al confirmar email.
+    if (data.session && data.user) {
+      // Sesión inmediata — insertar perfil directamente
+      await supabase.from('perfiles').upsert({
+        id:       data.user.id,
+        nombre:   form.nombre.trim(),
+        apellido: form.apellido.trim(),
+        email:    form.email.trim().toLowerCase(),
+        rol:      form.rol,
+        activo:   true,
+      })
+
+      // Si es alumno, crear fila en tabla alumnos
+      if (form.rol === 'alumno') {
+        await supabase.from('alumnos').insert({
           nombre:   form.nombre.trim(),
           apellido: form.apellido.trim(),
           email:    form.email.trim().toLowerCase(),
-          password: form.password,
-          rol:      form.rol,
-        }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setError(data.error || 'Error al crear la cuenta.')
-      } else {
-        setSuccess(true)
+          estado:   'activo',
+        })
       }
-    } catch {
-      setError('No se pudo conectar con el servidor. Verificá que el backend esté corriendo.')
     }
+
     setLoading(false)
+    setSuccess(true)
   }
 
   return (
@@ -214,40 +249,4 @@ export default function RegisterPage() {
                   onChange={set('confirmar')}
                   icon="🔒"
                   required
-                />
-
-                {error && (
-                  <div className="bg-red-900/30 border border-red-800 rounded-lg px-4 py-3 text-red-400 text-sm">
-                    {error}
-                  </div>
-                )}
-
-                <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>
-                  {loading ? 'Creando cuenta...' : 'Crear cuenta →'}
-                </Button>
-              </form>
-
-              {/* Link al login */}
-              <div className="flex items-center gap-3 my-5">
-                <div className="flex-1 h-px bg-gym-border" />
-                <span className="text-gym-grays text-xs">o</span>
-                <div className="flex-1 h-px bg-gym-border" />
-              </div>
-              <div className="text-center space-y-2">
-                <p className="text-gym-gray text-sm">
-                  ¿Ya tenés cuenta?{' '}
-                  <Link to="/login" className="text-gym-purplel hover:text-gym-yellow transition-colors font-medium">
-                    Ingresá acá
-                  </Link>
-                </p>
-                <Link to="/" className="block text-gym-gray text-sm hover:text-gym-yellow transition-colors">
-                  ← Volver al sitio del gimnasio
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
+               
