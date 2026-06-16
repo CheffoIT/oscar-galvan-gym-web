@@ -12,6 +12,63 @@ const ESTADO_INICIAL = {
   telefono: '', fecha_nacimiento: '', observaciones: '',
 }
 
+// ⚠️ Definido FUERA de AlumnosPage para evitar re-mount en cada keystroke
+function FormAlumno({ form, setForm, onSubmit, onCancel, modalEditar, saving, saveMsg, saveError }) {
+  return (
+    <form onSubmit={onSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <Input label="Nombre *" placeholder="Juan" value={form.nombre}
+          onChange={e => setForm(p => ({ ...p, nombre: e.target.value }))} required />
+        <Input label="Apellido *" placeholder="Pérez" value={form.apellido}
+          onChange={e => setForm(p => ({ ...p, apellido: e.target.value }))} required />
+      </div>
+      <Input label="DNI *" placeholder="38521478" value={form.dni}
+        onChange={e => setForm(p => ({ ...p, dni: e.target.value }))} required />
+      <Input label="Email" type="email" placeholder="juan@email.com" value={form.email}
+        onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
+      <Input label="Teléfono" placeholder="+54 9 261..." value={form.telefono}
+        onChange={e => setForm(p => ({ ...p, telefono: e.target.value }))} />
+      <Input label="Fecha de nacimiento" type="date" value={form.fecha_nacimiento}
+        onChange={e => setForm(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
+      {modalEditar && (
+        <div>
+          <label className="block text-sm font-medium text-gym-gray mb-1.5">Estado</label>
+          <select
+            value={form.estado || 'activo'}
+            onChange={e => setForm(p => ({ ...p, estado: e.target.value }))}
+            className="gym-input w-full text-sm"
+          >
+            <option value="activo">Activo</option>
+            <option value="moroso">Moroso</option>
+            <option value="inactivo">Inactivo</option>
+          </select>
+        </div>
+      )}
+      <div>
+        <label className="block text-sm font-medium text-gym-gray mb-1.5">Observaciones</label>
+        <textarea
+          rows={2}
+          value={form.observaciones}
+          onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
+          placeholder="Notas internas..."
+          className="w-full bg-gym-dark border border-gym-border text-gym-white placeholder:text-gym-grays
+            rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gym-purple resize-none"
+        />
+      </div>
+      {saveError && <p className="text-red-400 text-sm">{saveError}</p>}
+      {saveMsg   && <p className="text-green-400 text-sm">{saveMsg}</p>}
+      <div className="flex gap-3 justify-end pt-2">
+        <Button variant="ghost" type="button" onClick={onCancel}>
+          Cancelar
+        </Button>
+        <Button variant="primary" type="submit" disabled={saving}>
+          {saving ? 'Guardando...' : modalEditar ? 'Actualizar alumno' : 'Guardar alumno'}
+        </Button>
+      </div>
+    </form>
+  )
+}
+
 export default function AlumnosPage() {
   const [alumnos,      setAlumnos]      = useState([])
   const [membresias,   setMembresias]   = useState([])
@@ -147,61 +204,21 @@ export default function AlumnosPage() {
     },
   ]
 
-  // Formulario reutilizable (nuevo y editar)
-  const FormAlumno = () => (
-    <form onSubmit={handleGuardar} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <Input label="Nombre *" placeholder="Juan" value={form.nombre}
-          onChange={e => setForm(p => ({ ...p, nombre: e.target.value }))} required />
-        <Input label="Apellido *" placeholder="Pérez" value={form.apellido}
-          onChange={e => setForm(p => ({ ...p, apellido: e.target.value }))} required />
-      </div>
-      <Input label="DNI *" placeholder="38521478" value={form.dni}
-        onChange={e => setForm(p => ({ ...p, dni: e.target.value }))} required />
-      <Input label="Email" type="email" placeholder="juan@email.com" value={form.email}
-        onChange={e => setForm(p => ({ ...p, email: e.target.value }))} />
-      <Input label="Teléfono" placeholder="+54 9 261..." value={form.telefono}
-        onChange={e => setForm(p => ({ ...p, telefono: e.target.value }))} />
-      <Input label="Fecha de nacimiento" type="date" value={form.fecha_nacimiento}
-        onChange={e => setForm(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
-      {modalEditar && (
-        <div>
-          <label className="block text-sm font-medium text-gym-gray mb-1.5">Estado</label>
-          <select
-            value={form.estado || 'activo'}
-            onChange={e => setForm(p => ({ ...p, estado: e.target.value }))}
-            className="gym-input w-full text-sm"
-          >
-            <option value="activo">Activo</option>
-            <option value="moroso">Moroso</option>
-            <option value="inactivo">Inactivo</option>
-          </select>
-        </div>
-      )}
-      <div>
-        <label className="block text-sm font-medium text-gym-gray mb-1.5">Observaciones</label>
-        <textarea
-          rows={2}
-          value={form.observaciones}
-          onChange={e => setForm(p => ({ ...p, observaciones: e.target.value }))}
-          placeholder="Notas internas..."
-          className="w-full bg-gym-dark border border-gym-border text-gym-white placeholder:text-gym-grays
-            rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-gym-purple resize-none"
-        />
-      </div>
-      {saveError && <p className="text-red-400 text-sm">{saveError}</p>}
-      {saveMsg   && <p className="text-green-400 text-sm">{saveMsg}</p>}
-      <div className="flex gap-3 justify-end pt-2">
-        <Button variant="ghost" type="button"
-          onClick={() => { setModalNuevo(false); setModalEditar(null); setForm(ESTADO_INICIAL); setSaveMsg(''); setSaveError('') }}>
-          Cancelar
-        </Button>
-        <Button variant="primary" type="submit" disabled={saving}>
-          {saving ? 'Guardando...' : modalEditar ? 'Actualizar alumno' : 'Guardar alumno'}
-        </Button>
-      </div>
-    </form>
-  )
+  const cancelarForm = () => {
+    setModalNuevo(false)
+    setModalEditar(null)
+    setForm(ESTADO_INICIAL)
+    setSaveMsg('')
+    setSaveError('')
+  }
+
+  const formProps = {
+    form, setForm,
+    onSubmit: handleGuardar,
+    onCancel: cancelarForm,
+    modalEditar,
+    saving, saveMsg, saveError,
+  }
 
   return (
     <DashboardLayout title="Alumnos">
@@ -254,13 +271,13 @@ export default function AlumnosPage() {
       )}
 
       {/* Modal: Nuevo alumno */}
-      <Modal isOpen={modalNuevo} onClose={() => { setModalNuevo(false); setForm(ESTADO_INICIAL) }} title="NUEVO ALUMNO">
-        <FormAlumno />
+      <Modal isOpen={modalNuevo} onClose={cancelarForm} title="NUEVO ALUMNO">
+        <FormAlumno {...formProps} />
       </Modal>
 
       {/* Modal: Editar alumno */}
-      <Modal isOpen={!!modalEditar} onClose={() => { setModalEditar(null); setForm(ESTADO_INICIAL) }} title="EDITAR ALUMNO">
-        <FormAlumno />
+      <Modal isOpen={!!modalEditar} onClose={cancelarForm} title="EDITAR ALUMNO">
+        <FormAlumno {...formProps} />
       </Modal>
 
       {/* Modal: Ver detalle alumno */}

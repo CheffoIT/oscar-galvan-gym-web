@@ -121,9 +121,15 @@ export default function LoginPage() {
             <div className="flex-1 h-px bg-gym-border" />
           </div>
 
-          {/* Back to landing */}
-          <div className="text-center">
-            <Link to="/" className="text-gym-gray text-sm hover:text-gym-yellow transition-colors">
+          {/* Register + back */}
+          <div className="text-center space-y-2">
+            <p className="text-gym-gray text-sm">
+              ¿No tenés cuenta?{' '}
+              <Link to="/register" className="text-gym-purplel hover:text-gym-yellow transition-colors font-medium">
+                Registrate acá
+              </Link>
+            </p>
+            <Link to="/" className="block text-gym-gray text-sm hover:text-gym-yellow transition-colors">
               ← Volver al sitio del gimnasio
             </Link>
           </div>

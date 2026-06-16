@@ -9,6 +9,7 @@ const adminLinks = [
   { path: '/admin/rutinas',        icon: '📋', label: 'Rutinas' },
   { path: '/admin/pagos',          icon: '💰', label: 'Pagos' },
   { path: '/admin/configuracion',  icon: '⚙️',  label: 'Configuración' },
+  { path: '/admin/whatsapp',       icon: '💬', label: 'WhatsApp' },
 ]
 
 const entrenadorLinks = [

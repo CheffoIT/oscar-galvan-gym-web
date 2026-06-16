@@ -1,29 +1,76 @@
-# Dependencies
+# ─── Dependencias ────────────────────────────────────────────
 node_modules/
 frontend/node_modules/
 backend/node_modules/
 
-# Build output
+# ─── Build output ────────────────────────────────────────────
 frontend/dist/
 backend/dist/
 
-# Environment variables (NUNCA subir al repo)
+# ─── Variables de entorno — NUNCA subir al repo ──────────────
+# Si tu .env ya fue subido por error, rotá las credenciales inmediatamente.
 .env
+.env.local
+.env.*.local
 frontend/.env
+frontend/.env.local
+frontend/.env.*.local
 backend/.env
-*.env.local
+backend/.env.local
+backend/.env.*.local
 
-# Logs
+# Excluir solo los .example (esos sí van al repo)
+!.env.example
+!frontend/.env.example
+!backend/.env.example
+
+# ─── Logs ────────────────────────────────────────────────────
 *.log
 npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
-# OS
+# ─── OS ──────────────────────────────────────────────────────
 .DS_Store
+.DS_Store?
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# IDE
+# ─── IDE ─────────────────────────────────────────────────────
 .vscode/
 .idea/
+*.swp
+*.swo
+*.suo
 
-# Vite cache
+# ─── Vite cache ──────────────────────────────────────────────
 frontend/.vite/
+frontend/vite.config.js.timestamp-*.mjs
+
+# ─── Source maps (no exponer en producción) ──────────────────
+# frontend/dist/**/*.map
+
+# ─── Archivos de subida temporales ───────────────────────────
+backend/uploads/
+backend/tmp/
+
+# ─── Certificados SSL locales ────────────────────────────────
+*.pem
+*.key
+*.crt
+*.p12
+
+# ─── WhatsApp session ────────────────────────────────────────
+.wwebjs_auth/
+.wwebjs_cache/
+
+# ─── Scripts de deploy locales (contienen rutas hardcodeadas) ─
+push_to_github.bat
+git_push.ps1
+*.bat
+*.ps1
+
+# ─── Logs de git ─────────────────────────────────────────────
+git_log.txt
