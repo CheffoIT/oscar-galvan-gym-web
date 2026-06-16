@@ -36,15 +36,16 @@ DECLARE
 BEGIN
 
   -- ── Perfiles ──────────────────────────────────────────────
-  INSERT INTO perfiles (id, nombre, apellido, rol) VALUES
-    (v_admin_id,      'Oscar',   'Galvan', 'admin'),
-    (v_entrenador_id, 'Carlos',  'Ramos',  'entrenador'),
-    (v_alumno_id,     'Lucas',   'Fernández', 'alumno')
-  ON CONFLICT (id) DO NOTHING;
+  INSERT INTO perfiles (id, nombre, apellido, rol, activo) VALUES
+    (v_admin_id,      'Oscar',   'Galvan',    'admin',      true),
+    (v_entrenador_id, 'Carlos',  'Ramos',     'entrenador', true),
+    (v_alumno_id,     'Lucas',   'Fernández', 'alumno',     true)
+  ON CONFLICT (id) DO UPDATE SET activo = true;
 
   -- ── Entrenador ────────────────────────────────────────────
-  INSERT INTO entrenadores (id, perfil_id, especialidad)
-  VALUES (uuid_generate_v4(), v_entrenador_id, 'Musculación y fuerza')
+  INSERT INTO entrenadores (id, perfil_id, especialidad, activo)
+  SELECT uuid_generate_v4(), v_entrenador_id, 'Musculación y fuerza', true
+  WHERE NOT EXISTS (SELECT 1 FROM entrenadores WHERE perfil_id = v_entrenador_id)
   RETURNING id INTO v_entrenador_ref;
 
   -- ── Configuración del gimnasio ────────────────────────────
